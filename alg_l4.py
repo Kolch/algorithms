@@ -1,57 +1,90 @@
 #Kolchedanstev Alexey
 
-# Задача о коняшке
-def knightsTour(x0, y0, done, size=5):
-    # создаем шахматную доску в виде 2го списка
-    h = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-    # начальная координата(1го хода)
-    h[x0][y0] = 1
 
-    # Возможные ходы
-    dx = [2, 1, -1, -2, -2, -1, 1, 2]
-    dy = [1, 2, 2, 1, -1, -2, -2, -1]
+move_count = 8
 
-    def CanBeDone(u, v, i):
-        h[u][v] = i
-        done = tryNextMove(u, v, i)
-        if not done:
-            h[u][v] = 0
-        return done
+possible_moves = [
+        [-1, -2], [-2, -1], [-2,  1], [ 1, -2],
+        [-1,  2], [ 2, -1], [ 1,  2], [ 2,  1]]
+xrows = 5
+ycols = 5
+sx = 0
+sy = 0
 
-    def tryNextMove(x, y, i):
+# Что бы изменить размер доски, необходимо вручную изменить размер массива desk
+# и измеить переменные xrows и ycols
+desk = [[],[],[],[],[],[]]
+for x in range(xrows):
+    for y in range(ycols):
+       desk[x].append(0) 
 
-        # eos - показывает все ли варианты возможных 8ми ходов мы рассмотрели
-        # done - показывает удачна ли данная ветка решения
-        # k - порядковый номер рассмотренной попытки из 8 допустимых
-        env = {'done': False, 'eos': False, 'u': x, 'v': y, 'k': -1}
+_desk = desk
+size_x = xrows
+size_y = ycols
+max_moves = (size_x * size_y) - 1
 
-        def next():
-            x = env['u']
-            y = env['v']
-            while env['k'] < 8:
-                env['k'] += 1;
-                if env['k'] < 8:
-                    env['u'] = x + dx[env['k']]
-                    env['v'] = y + dy[env['k']]
-                if (env['u'] >= 0 and env['u'] < size) and (env['v'] >= 0 and env['v'] < size) and h[env['u']][
-                    env['v']] == 0:
-                    break
-            env['eos'] = (env['k'] == 8)
+def if_possible_to_put(x, y):
+    return x >= 0 and y >= 0 and x < size_x and y < size_y
 
-        if i < size ** 2:  # если доска не заполнена
-            next()
-            while not env['eos'] and not CanBeDone(env['u'], env['v'], i + 1):
-                next()
-            done = not env['eos']
-        else:
-            done = True
-        return done
+def possible_move(x, y):
+    return if_possible_to_put(x,y) and _desk[x][y] == 0
 
-    tryNextMove(x0, y0, 1)
-    for i in range(5):
-        print(h[i])
+def search_the_way(_x, _y, count):
+    i = 0
+    next_x = 0
+    next_y = 0
+    _desk[_x][_y] = count
+    if count > max_moves:
+        return 1
 
-knightsTour(0,4,False)
+    while i < move_count:
+        next_x = _x + possible_moves[i][0]
+        next_y = _y + possible_moves[i][1]
+
+        if possible_move(next_x, next_y) and search_the_way(next_x, next_y, count + 1):
+            return 1
+        i += 1
+
+    _desk[_x][_y] = 0
+    count += 1
+    return 0
+
+def outPut():
+    i = 0
+    j = 0
+    while i < size_x:
+        while j < size_y:
+            print(_desk[j])
+            j += 1
+        i += 1
+
+
+if search_the_way(sx, sy, 1):
+    outPut()
+else:
+    print("Not possible")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
